@@ -1,0 +1,26 @@
+dn: olcDatabase=mdb,cn=config
+objectClass: olcDatabaseConfig
+objectClass: olcMdbConfig
+olcDatabase: mdb
+olcDbMaxSize: 42949672960
+olcDbDirectory: /var/lib/openldap
+olcSuffix: ${suffix}
+olcRootDN: cn=admin,${suffix}
+olcRootPW: ${passwd}
+olcDbIndex: uid pres,eq
+olcDbIndex: cn,sn pres,eq,approx,sub
+olcDbIndex: mail pres,eq,sub
+olcDbIndex: objectClass pres,eq
+olcDbIndex: loginShell pres,eq
+olcDbIndex: sudoUser,sudoHost pres,eq
+olcAccess: to attrs=userPassword,shadowLastChange,shadowExpire
+  by self write
+  by anonymous auth
+  by dn.subtree="gidNumber=0+uidNumber=0,cn=peercred,cn=external,cn=auth" manage 
+  by dn.subtree="ou=system,${suffix}" read
+  by * none
+olcAccess: to dn.subtree="ou=system,${suffix}" by dn.subtree="gidNumber=0+uidNumber=0,cn=peercred,cn=external,cn=auth" manage
+  by * none
+olcAccess: to dn.subtree="${suffix}" by dn.subtree="gidNumber=0+uidNumber=0,cn=peercred,cn=external,cn=auth" manage
+  by users read 
+  by * none

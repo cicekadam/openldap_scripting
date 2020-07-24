@@ -1,0 +1,11 @@
+dn: ou=system,${suffix}
+objectClass: organizationalUnit
+objectClass: top
+ou: system
+
+dn: cn=readonly,ou=system,${suffix}
+objectClass: organizationalRole
+objectClass: simpleSecurityObject
+cn: readonly
+userPassword: ${bindpasswd}
+description: Bind DN user for LDAP Operations

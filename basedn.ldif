@@ -1,0 +1,16 @@
+dn: ${suffix}
+objectClass: dcObject
+objectClass: organization
+objectClass: top
+o: ${suffix2}
+dc: ${suffix1}
+
+dn: ou=groups,${suffix}
+objectClass: organizationalUnit
+objectClass: top
+ou: groups
+
+dn: ou=people,${suffix}
+objectClass: organizationalUnit
+objectClass: top
+ou: people

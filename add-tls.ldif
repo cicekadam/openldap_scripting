@@ -1,0 +1,10 @@
+dn: cn=config
+changetype: modify
+add: olcTLSCACertificateFile
+olcTLSCACertificateFile: /etc/pki/tls/ldapserver.crt
+-
+add: olcTLSCertificateKeyFile
+olcTLSCertificateKeyFile: /etc/pki/tls/ldapserver.key
+-
+add: olcTLSCertificateFile
+olcTLSCertificateFile: /etc/pki/tls/ldapserver.crt
