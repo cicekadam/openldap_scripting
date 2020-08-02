@@ -20,7 +20,7 @@ read VER
 
 
 
-yum install cyrus-sasl-devel make libtool autoconf libtool-ltdl-devel openssl-devel libdb-devel tar gcc perl perl-devel wget vim
+yum install -y cyrus-sasl-devel make libtool autoconf libtool-ltdl-devel openssl-devel libdb-devel tar gcc perl perl-devel wget vim
 
 useradd -r -M -d /var/lib/openldap -u 55 -s /usr/sbin/nologin ldap
 wget ftp://ftp.openldap.org/pub/OpenLDAP/openldap-release/openldap-$VER.tgz
@@ -56,14 +56,14 @@ chmod 640 /etc/openldap/slapd.conf
 
 
 
-cp ./systemd-service-file /etc/systemd/system/slapd.service
+cp $(dirname $0)/systemd-service-file /etc/systemd/system/slapd.service
 
 cp /usr/share/doc/sudo/schema.OpenLDAP  /etc/openldap/schema/sudo.schema
 
-cp ./sudo.ldif /etc/openldap/schema/sudo.ldif
+cp $(dirname $0)/sudo.ldif /etc/openldap/schema/sudo.ldif
 
 mv /etc/openldap/slapd.ldif /etc/openldap/slapd.ldif.bak
-cp ./slapd.dif /etc/openldap/slapd.ldif
+cp $(dirname $0)/slapd.dif /etc/openldap/slapd.ldif
 
 # To update the SLAPD database from the information provided on the SLAPD LDIF file above
 slapadd -n 0 -F /etc/openldap/slapd.d -l /etc/openldap/slapd.ldif
@@ -78,7 +78,7 @@ systemctl restart rsyslog
 
 
 
-expandVarsStrict <<< $(cat ./rootdn.ldif) > $HOME/rootdn.ldif
+expandVarsStrict <<< $(cat $(dirname $0)/rootdn.ldif) > $HOME/rootdn.ldif
 ldapadd -Y EXTERNAL -H ldapi:/// -f $HOME/rootdn.ldif
 
 
@@ -86,18 +86,18 @@ openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout \
 /etc/pki/tls/ldapserver.key -out /etc/pki/tls/ldapserver.crt
 
 chown ldap:ldap /etc/pki/tls/{ldapserver.crt,ldapserver.key}
-ldapadd -Y EXTERNAL -H ldapi:/// -f ./add-tls.ldif
+ldapadd -Y EXTERNAL -H ldapi:/// -f $(dirname $0)/add-tls.ldif
 echo "TLS_CACERT     /etc/pki/tls/ldapserver.crt" >> /etc/openldap/ldap.conf
 
 
-expandVarsStrict <<< $(cat ./basedn.ldif) > $HOME/basedn.ldif
+expandVarsStrict <<< $(cat $(dirname $0)/basedn.ldif) > $HOME/basedn.ldif
 ldapadd -Y EXTERNAL -H ldapi:/// -f $HOME/basedn.ldif
 
 
 echo "Now I need a password for BindDN user of this directory service!"
 bindpasswd=$(slappasswd)
 
-expandVarsStrict <<< $(cat ./bindDNuser.ldif) > $HOME/bindDNuser.ldif
+expandVarsStrict <<< $(cat $(dirname $0)/bindDNuser.ldif) > $HOME/bindDNuser.ldif
 ldapadd -Y EXTERNAL -H ldapi:/// -f $HOME/bindDNuser.ldif
 
 echo "Do you use firewalld (y/n): "
