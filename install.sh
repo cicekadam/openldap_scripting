@@ -48,19 +48,19 @@ make install
 echo "Installation is done, now we are configuring OpenLdap Server"
 echo "Enter your top level domain (e.g. com):"
 read suffix3
-if [[ !$suffix3 ]]; then
+if [[ -z $suffix3 ]]; then
 	suffix3="com"
 fi
 
 echo "Enter your domain (e.g. mydomain):"
 read suffix2
-if [[ !$suffix2 ]]; then
+if [[ -z $suffix2 ]]; then
 	suffix2="mydomain"
 fi
 
 echo "Enter your sub level domain (e.g. ldap):"
 read suffix1
-if [[ !$suffix1 ]]; then
+if [[ -z $suffix1 ]]; then
 	suffix1="com"
 fi
 
@@ -91,13 +91,14 @@ cp $(dirname $0)/slapd.dif /etc/openldap/slapd.ldif
 
 # To update the SLAPD database from the information provided on the SLAPD LDIF file above
 slapadd -n 0 -F /etc/openldap/slapd.d -l /etc/openldap/slapd.ldif
+chown -R ldap:ldap /etc/openldap/slapd.d
 
 # Ready to go
 systemctl daemon-reload
 systemctl enable --now slapd
 
 # Enabling logs
-ldapmodify -Y external -H ldapi:/// -f enable-ldap-log.ldif
+ldapmodify -Y external -H ldapi:/// -f $(dirname $0)/enable-ldap-log.ldif
 echo "local4.* /var/log/slapd.log" >> /etc/rsyslog.conf
 systemctl restart rsyslog
 
@@ -111,6 +112,12 @@ ldapadd -Y EXTERNAL -H ldapi:/// -f $HOME/basedn.ldif
 # Creating binddn for ldap operations
 echo "Now I need a password for BindDN user of this directory service!"
 bindpasswd=$(slappasswd)
+while [ $? -ne 0 ]
+do
+	echo "Try again please."
+	bindpasswd=$(slappasswd)
+done
+
 
 expandVarsStrict <<< $(cat $(dirname $0)/bindDNuser.ldif) > $HOME/bindDNuser.ldif
 ldapadd -Y EXTERNAL -H ldapi:/// -f $HOME/bindDNuser.ldif
@@ -129,7 +136,7 @@ echo "TLS_CACERT     /etc/pki/tls/ldapserver.crt" >> /etc/openldap/ldap.conf
 echo "Do you use firewalld (y/n): "
 read answer
 
-if [ $answer == "y" ]; then
+if [ $answer == "y" && -z $answer ]; then
 	firewall-cmd --add-service={ldap,ldaps} --permanent
 	firewall-cmd --reload
 fi
