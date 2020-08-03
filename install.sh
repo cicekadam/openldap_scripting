@@ -67,7 +67,7 @@ fi
 echo "Now I need a password for root user of this directory service!"
 rootpasswd=$(slappasswd)
 
-while [ $?!=0 ]
+while [ $? -ne 0 ]
 do
 	echo "Try again please."
 	rootpasswd=$(slappasswd)
