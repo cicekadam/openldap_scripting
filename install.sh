@@ -61,7 +61,7 @@ fi
 echo "Enter your sub level domain (e.g. ldap):"
 read suffix1
 if [[ -z $suffix1 ]]; then
-	suffix1="com"
+	suffix1="ldap"
 fi
 
 echo "Now I need a password for root user of this directory service!"
@@ -136,7 +136,7 @@ echo "TLS_CACERT     /etc/pki/tls/ldapserver.crt" >> /etc/openldap/ldap.conf
 echo "Do you use firewalld (y/n): "
 read answer
 
-if [ $answer == "y" && -z $answer ]; then
+if [[ $answer == "y" && -z $answer ]]; then
 	firewall-cmd --add-service={ldap,ldaps} --permanent
 	firewall-cmd --reload
 fi
